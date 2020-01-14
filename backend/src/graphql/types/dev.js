@@ -3,8 +3,9 @@ const {
   GraphQLObjectType,
   GraphQLList,
   GraphQLID,
-  GraphQLString
+  GraphQLString,
 } = graphql;
+const PointType = require('./point');
 
 const DevType = new GraphQLObjectType({
   name:  'DevType',
@@ -15,6 +16,7 @@ const DevType = new GraphQLObjectType({
     github_username: { type: GraphQLString },
     avatar_url: { type: GraphQLString },
     technologies: { type: new GraphQLList(GraphQLString), },
+    location: { type: PointType },
   })
 });
 

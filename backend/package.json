@@ -5,8 +5,8 @@
   "author": "Paulo Medeiros",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
   },
   "dependencies": {
     "express": "^4.17.1",

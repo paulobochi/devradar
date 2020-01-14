@@ -5,11 +5,12 @@ const mongoose = require("mongoose");
 const expressGraphQL = require("express-graphql");
 const schema = require("./graphql/schema");
 
-const MONGO_URI = 'mongodb://localhost:27017/devradar';
+const MONGO_URI = 'mongodb://db:27017/devradar';
 
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useCreateIndex: true,
 });
 
 const app = express();

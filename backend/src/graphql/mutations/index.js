@@ -24,22 +24,28 @@ const mutation = new GraphQLObjectType({
         longitude: { type: GraphQLFloat },
       },
       async resolve(parentValue, { name, github_username, technologies, latitude, longitude }) {
-        const githubResponse = await axios.get(`https://api.github.com/users/${github_username}`)
-        const { avatar_url, bio} = githubResponse.data;
+        let dev = await Dev.findOne({ github_username });
 
-        const location = {
-          type: 'Point',
-          coordinates: [longitude, latitude]
+        if (!dev) {
+          const githubResponse = await axios.get(`https://api.github.com/users/${github_username}`)
+          const { avatar_url, bio} = githubResponse.data;
+
+          const location = {
+            type: 'Point',
+            coordinates: [longitude, latitude]
+          }
+
+          dev = await Dev.create({
+            name,
+            github_username,
+            bio,
+            avatar_url,
+            technologies,
+            location
+          });
         }
 
-        return new Dev({
-          name,
-          github_username,
-          bio,
-          avatar_url,
-          technologies,
-          location
-        }).save();
+        return dev;
       }
     },
     deleteDev: {

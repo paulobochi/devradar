@@ -3,6 +3,7 @@ require('./models');
 const express = require('express');
 const mongoose = require('mongoose');
 const expressGraphQL = require('express-graphql');
+const cors = require('cors');
 const schema = require('./graphql/schema');
 
 const MONGO_URI = 'mongodb://db:27017/devradar';
@@ -16,7 +17,7 @@ mongoose.connect(MONGO_URI, {
 const app = express();
 
 app.use(express.json());
-
+app.use(cors());
 app.use(
   '/graphql',
   expressGraphQL({

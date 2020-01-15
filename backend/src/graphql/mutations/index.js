@@ -17,20 +17,19 @@ const mutation = new GraphQLObjectType({
     addDev: {
       type: DevType,
       args: {
-        name: { type: GraphQLString },
         githubUsername: { type: GraphQLString },
         technologies: { type: new GraphQLList(GraphQLString) },
         latitude: { type: GraphQLFloat },
         longitude: { type: GraphQLFloat },
       },
       async resolve(parentValue, {
-        name, githubUsername, technologies, latitude, longitude,
+        githubUsername, technologies, latitude, longitude,
       }) {
         let dev = await Dev.findOne({ githubUsername });
 
         if (!dev) {
           const githubResponse = await axios.get(`https://api.github.com/users/${githubUsername}`);
-          const { bio } = githubResponse.data;
+          const { name, bio } = githubResponse.data;
 
           const location = {
             type: 'Point',

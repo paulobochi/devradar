@@ -1,16 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { useLazyLoadQuery } from 'react-relay/hooks';
+import { useLazyLoadQuery, useRelayEnvironment } from 'react-relay/hooks';
 import graphql from 'babel-plugin-relay/macro';
+import { commitMutation, ConnectionHandler } from 'relay-runtime';
 
 import './global.css';
 import './App.css';
 import './Sidebar.css';
 import './Main.css';
 
-function App({ props }) {
+const addDevMutation = graphql`
+  mutation AppAddDevMutation (
+    $githubUsername: String!
+    $technologies: [String]!
+    $latitude: Float!
+    $longitude: Float!
+  ) {
+    addDev(
+      githubUsername: $githubUsername
+      technologies: $technologies 
+      latitude: $latitude
+      longitude: $longitude
+    ) {
+      id
+      name
+      technologies
+      bio
+      githubUsername
+      avatarUrl
+    }
+  }
+`;
+
+function App() {
+  const [githubUsername, setGithubUsername] = useState('');
+  const [technologies, setTechnologies] = useState('');
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
-
+  const environment = useRelayEnvironment();
   const { devs } = useLazyLoadQuery(
     graphql`
       query AppQuery {
@@ -20,6 +46,7 @@ function App({ props }) {
           technologies
           bio
           githubUsername
+          avatarUrl
         }
       }
     `,
@@ -40,22 +67,62 @@ function App({ props }) {
     );
   }, []);
 
+  const handleAddDev = (e) => {
+    e.preventDefault();
+
+    commitMutation(environment, {
+      mutation: addDevMutation,
+      variables: {
+        githubUsername,
+        technologies: technologies.split(',').map((t) => t.trim()),
+        latitude,
+        longitude,
+      },
+      onCompleted: () => {
+        setGithubUsername('');
+        setTechnologies('');
+      },
+      onError: (err) => console.error(err),
+      updater: (store) => {
+        const newDev = store.getRootField('addDev');
+        const currentDevs = store.getRoot().getLinkedRecords('devs');
+        const exists = currentDevs.filter((dev) => dev.getValue('id') === newDev.getValue('id')).length > 0;
+        if (!exists) {
+          currentDevs.push(newDev);
+          store.getRoot().setLinkedRecords(currentDevs, 'devs');
+        }
+      },
+    });
+  };
+
   return (
     <div id="app">
       <aside>
         <strong>Cadastrar</strong>
-        <form>
+        <form onSubmit={handleAddDev}>
           <div className="input-block">
             <label htmlFor="github_username">
               Usuário do Github
-              <input name="github_username" id="github_username" required />
+              <input
+                name="github_username"
+                id="github_username"
+                required
+                value={githubUsername}
+                onChange={(e) => setGithubUsername(e.target.value)}
+              />
             </label>
           </div>
 
           <div className="input-block">
             <label htmlFor="technologies ">
               Tecnologias
-              <input name="technologies" id="technologies" required />
+              <input
+                name="technologies"
+                id="technologies"
+                required
+                value={technologies}
+                onChange={(e) => setTechnologies(e.target.value)}
+              />
             </label>
           </div>
 
@@ -65,9 +132,9 @@ function App({ props }) {
       <main>
         <ul>
           {devs && devs.map((dev) => (
-            <li className="dev-item">
+            <li className="dev-item" key={dev.id}>
               <header>
-                <img src="https://avatars0.githubusercontent.com/u/1917990?s=460&v=4" alt="Paulo Medeiros" />
+                <img src={dev.avatarUrl} alt={dev.name} />
                 <div className="user-info">
                   <strong>{dev.name}</strong>
                   <span>{(dev.technologies || []).join(', ')}</span>

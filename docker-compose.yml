@@ -6,7 +6,7 @@ services:
       - ./.mongodb:/data/db
     ports:
       - "27017:27017"
-  api:
+  backend:
     build:
       context: ./backend
       dockerfile: dev.Dockerfile
@@ -17,3 +17,14 @@ services:
       - db
     ports:
       - "3333:3333"
+  web:
+    build:
+      context: ./web
+      dockerfile: dev.Dockerfile
+    volumes:
+      - /app/node_modules
+      - ./web:/app
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"

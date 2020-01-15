@@ -7,6 +7,7 @@ module.exports = {
   extends: [
     'airbnb-base',
   ],
+  plugins: ['import'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
@@ -15,5 +16,10 @@ module.exports = {
     ecmaVersion: 2018,
   },
   rules: {
+  },
+  settings: {
+    'import/resolver': {
+      node: {},
+    },
   },
 };

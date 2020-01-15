@@ -8,7 +8,7 @@ import App from './App';
 
 ReactDOM.render(
   <RelayEnvironmentProvider environment={RelayEnvironment}>
-    <Suspense fallback={<div>Loading... </div>}>
+    <Suspense fallback={<div />}>
       <App />
     </Suspense>
   </RelayEnvironmentProvider>,

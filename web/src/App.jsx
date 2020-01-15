@@ -11,12 +11,15 @@ function App({ props }) {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
 
-  const data = useLazyLoadQuery(
+  const { devs } = useLazyLoadQuery(
     graphql`
       query AppQuery {
         devs {
           id
           name
+          technologies
+          bio
+          githubUsername
         }
       }
     `,
@@ -38,7 +41,6 @@ function App({ props }) {
   }, []);
 
   return (
-
     <div id="app">
       <aside>
         <strong>Cadastrar</strong>
@@ -62,50 +64,19 @@ function App({ props }) {
       </aside>
       <main>
         <ul>
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars0.githubusercontent.com/u/1917990?s=460&v=4" alt="Paulo Medeiros" />
-              <div className="user-info">
-                <strong>Paulo Medeiros</strong>
-                <span>ReactJS, Node.js, Ruby</span>
-              </div>
-            </header>
-            <p>Software Enginner at Jusbrasil</p>
-            <a href="https://github.com/paulobochi" target="_blank" rel="noopener noreferrer">Acessar perfil github</a>
-          </li>
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars0.githubusercontent.com/u/1917990?s=460&v=4" alt="Paulo Medeiros" />
-              <div className="user-info">
-                <strong>Paulo Medeiros</strong>
-                <span>ReactJS, Node.js, Ruby</span>
-              </div>
-            </header>
-            <p>Software Enginner at Jusbrasil</p>
-            <a href="https://github.com/paulobochi" target="_blank" rel="noopener noreferrer">Acessar perfil github</a>
-          </li>
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars0.githubusercontent.com/u/1917990?s=460&v=4" alt="Paulo Medeiros" />
-              <div className="user-info">
-                <strong>Paulo Medeiros</strong>
-                <span>ReactJS, Node.js, Ruby</span>
-              </div>
-            </header>
-            <p>Software Enginner at Jusbrasil</p>
-            <a href="https://github.com/paulobochi" target="_blank" rel="noopener noreferrer">Acessar perfil github</a>
-          </li>
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars0.githubusercontent.com/u/1917990?s=460&v=4" alt="Paulo Medeiros" />
-              <div className="user-info">
-                <strong>Paulo Medeiros</strong>
-                <span>ReactJS, Node.js, Ruby</span>
-              </div>
-            </header>
-            <p>Software Enginner at Jusbrasil</p>
-            <a href="https://github.com/paulobochi" target="_blank" rel="noopener noreferrer">Acessar perfil github</a>
-          </li>
+          {devs && devs.map((dev) => (
+            <li className="dev-item">
+              <header>
+                <img src="https://avatars0.githubusercontent.com/u/1917990?s=460&v=4" alt="Paulo Medeiros" />
+                <div className="user-info">
+                  <strong>{dev.name}</strong>
+                  <span>{(dev.technologies || []).join(', ')}</span>
+                </div>
+              </header>
+              <p>{dev.bio}</p>
+              <a href={`https://github.com/${dev.githubUsername}`} target="_blank" rel="noopener noreferrer">Acessar perfil github</a>
+            </li>
+          ))}
         </ul>
       </main>
     </div>

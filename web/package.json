@@ -8,13 +8,15 @@
     "@testing-library/user-event": "^7.1.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
+    "react-relay": "^8.0.0",
     "react-scripts": "3.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "relay": "relay-compiler --src ./src --schema ./schema.graphql --extensions js jsx"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -32,12 +34,17 @@
     ]
   },
   "devDependencies": {
+    "babel-plugin-relay": "^8.0.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-jest": "^23.6.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.17.0",
-    "eslint-plugin-react-hooks": "^1.7.0"
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "graphql": "^14.5.8",
+    "graphql-cli": "^4.0.1-beta.0",
+    "relay-compiler": "^8.0.0",
+    "relay-config": "^8.0.0"
   }
 }

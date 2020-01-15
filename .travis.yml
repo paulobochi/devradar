@@ -1,0 +1,18 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t paulomedeiros88/devradar-web:dev -f ./web/dev.Dockerfile ./web
+
+script:
+  - docker run -e CI=true paulomedeiros88/devradar-web:dev npm test
+
+after_success:
+  - docker build -t paulomedeiros88/devradar-backend ./backend
+  - docker build -t paulomedeiros88/devradar-web ./web
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push paulomedeiros88/devradar-backend
+  - docker push paulomedeiros88/devradar-web

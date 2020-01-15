@@ -1,13 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { useLazyLoadQuery } from 'react-relay/hooks';
+import graphql from 'babel-plugin-relay/macro';
 
 import './global.css';
 import './App.css';
 import './Sidebar.css';
 import './Main.css';
 
-function App() {
+function App({ props }) {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
+
+  const data = useLazyLoadQuery(
+    graphql`
+      query AppQuery {
+        devs {
+          id
+          name
+        }
+      }
+    `,
+  );
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -25,6 +38,7 @@ function App() {
   }, []);
 
   return (
+
     <div id="app">
       <aside>
         <strong>Cadastrar</strong>

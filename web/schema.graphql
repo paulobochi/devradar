@@ -1,0 +1,30 @@
+schema {
+  query: RootQueryType
+  mutation: Mutation
+}
+
+type DevType {
+  id: ID
+  name: String
+  bio: String
+  githubUsername: String
+  avatarUrl: String
+  technologies: [String]
+  location: PointType
+}
+
+type Mutation {
+  addDev(name: String, githubUsername: String, technologies: [String], latitude: Float, longitude: Float): DevType
+  deleteDev(id: ID): DevType
+}
+
+type PointType {
+  id: ID
+  type: String
+  coordinates: [Float]
+}
+
+type RootQueryType {
+  devs(latitude: Float, longitude: Float, technologies: [String]): [DevType]
+  dev(id: ID!): DevType
+}

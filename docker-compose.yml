@@ -10,9 +10,9 @@ services:
     build:
       context: ./backend
       dockerfile: dev.Dockerfile
-    volumes:
-      # - /app/node_modules
-      - ./backend:/app
+    # volumes:
+    #   - /app/node_modules
+    #   - ./backend:/app
     depends_on:
       - db
     ports:
@@ -21,9 +21,9 @@ services:
     build:
       context: ./web
       dockerfile: dev.Dockerfile
-    volumes:
-      # - /app/node_modules
-      - ./web:/app
+    # volumes:
+    #   - /app/node_modules
+    #   - ./web:/app
     depends_on:
       - backend
     ports:

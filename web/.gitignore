@@ -22,8 +22,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# graphql schema
-schema.graphql
-
 #relay
 /src/__generated__

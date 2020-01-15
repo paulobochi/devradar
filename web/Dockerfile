@@ -3,6 +3,7 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install
 COPY . .
+RUN yarn relay
 RUN yarn build
 
 FROM node:lts-alpine3.11

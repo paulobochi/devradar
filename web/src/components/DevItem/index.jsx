@@ -23,6 +23,7 @@ DevItem.propTypes = {
   dev: PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
+    githubUsername: PropTypes.string,
     avatarUrl: PropTypes.string,
     technologies: PropTypes.array,
     bio: PropTypes.string,

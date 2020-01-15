@@ -1,61 +1,63 @@
-const { 
-  GraphQLObjectType, 
-  GraphQLString, 
-  GraphQLID, 
-  GraphQLList, 
+const {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLID,
+  GraphQLList,
   GraphQLFloat,
-} = require("graphql");
+} = require('graphql');
 const axios = require('axios');
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const Dev = mongoose.model('dev');
 const DevType = require('../types/dev');
 
 const mutation = new GraphQLObjectType({
-  name: "Mutation",
+  name: 'Mutation',
   fields: {
     addDev: {
       type: DevType,
       args: {
         name: { type: GraphQLString },
-        github_username: { type: GraphQLString },
+        githubUsername: { type: GraphQLString },
         technologies: { type: new GraphQLList(GraphQLString) },
         latitude: { type: GraphQLFloat },
         longitude: { type: GraphQLFloat },
       },
-      async resolve(parentValue, { name, github_username, technologies, latitude, longitude }) {
-        let dev = await Dev.findOne({ github_username });
+      async resolve(parentValue, {
+        name, githubUsername, technologies, latitude, longitude,
+      }) {
+        let dev = await Dev.findOne({ githubUsername });
 
         if (!dev) {
-          const githubResponse = await axios.get(`https://api.github.com/users/${github_username}`)
-          const { avatar_url, bio} = githubResponse.data;
+          const githubResponse = await axios.get(`https://api.github.com/users/${githubUsername}`);
+          const { bio } = githubResponse.data;
 
           const location = {
             type: 'Point',
-            coordinates: [longitude, latitude]
-          }
+            coordinates: [longitude, latitude],
+          };
 
           dev = await Dev.create({
             name,
-            github_username,
+            githubUsername,
             bio,
-            avatar_url,
+            avatarUrl: githubResponse.data.avatar_url,
             technologies,
-            location
+            location,
           });
         }
 
         return dev;
-      }
+      },
     },
     deleteDev: {
       type: DevType,
       args: { id: { type: GraphQLID } },
       resolve(parentValue, { id }) {
         return Dev.remove({ _id: id });
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 module.exports = mutation;

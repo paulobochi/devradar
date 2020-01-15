@@ -1,9 +1,9 @@
-require("./models");
+require('./models');
 
-const express = require("express");
-const mongoose = require("mongoose");
-const expressGraphQL = require("express-graphql");
-const schema = require("./graphql/schema");
+const express = require('express');
+const mongoose = require('mongoose');
+const expressGraphQL = require('express-graphql');
+const schema = require('./graphql/schema');
 
 const MONGO_URI = 'mongodb://db:27017/devradar';
 
@@ -18,11 +18,11 @@ const app = express();
 app.use(express.json());
 
 app.use(
-  "/graphql",
+  '/graphql',
   expressGraphQL({
     schema,
-    graphiql: true
-  })
+    graphiql: true,
+  }),
 );
 
 app.listen(3333);

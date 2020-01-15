@@ -1,4 +1,5 @@
 const graphql = require('graphql');
+
 const {
   GraphQLObjectType,
   GraphQLList,
@@ -8,12 +9,12 @@ const {
 } = graphql;
 
 const PointType = new GraphQLObjectType({
-  name:  'PointType',
+  name: 'PointType',
   fields: () => ({
     id: { type: GraphQLID },
     type: { type: GraphQLString },
-    coordinates: { type: new GraphQLList(GraphQLFloat), },
-  })
+    coordinates: { type: new GraphQLList(GraphQLFloat) },
+  }),
 });
 
 module.exports = PointType;

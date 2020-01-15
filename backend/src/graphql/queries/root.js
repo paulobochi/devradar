@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const { 
-  GraphQLObjectType, 
-  GraphQLList, 
-  GraphQLID, 
-  GraphQLNonNull, 
-  GraphQLFloat, 
+const {
+  GraphQLObjectType,
+  GraphQLList,
+  GraphQLID,
+  GraphQLNonNull,
+  GraphQLFloat,
   GraphQLString,
 } = require('graphql');
 
@@ -16,9 +16,9 @@ const RootQuery = new GraphQLObjectType({
   fields: () => ({
     devs: {
       type: new GraphQLList(DevType),
-      args: { 
-        latitude: { type: GraphQLFloat }, 
-        longitude: { type: GraphQLFloat }, 
+      args: {
+        latitude: { type: GraphQLFloat },
+        longitude: { type: GraphQLFloat },
         technologies: { type: new GraphQLList(GraphQLString) },
       },
       resolve(parentValue, { latitude, longitude, technologies }) {
@@ -34,25 +34,25 @@ const RootQuery = new GraphQLObjectType({
               $maxDistance: 10000,
             },
           };
-        };
-        
+        }
+
         if (technologies && technologies.length > 0) {
           filters.technologies = {
             $in: technologies,
           };
-        };
+        }
 
         return Dev.find(filters);
-      }
+      },
     },
     dev: {
       type: DevType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve(parentValue, { id }) {
         return Dev.findById(id);
-      }
+      },
     },
-  })
+  }),
 });
 
 module.exports = RootQuery;

@@ -9,10 +9,10 @@ script:
   - docker run -e CI=true paulomedeiros88/devradar-web:dev npm test
 
 after_success:
-  - docker build -t paulomedeiros88/devradar-backend ./backend
-  - docker build -t paulomedeiros88/devradar-web ./web
+  - docker build -t registry.heroku.com/devradar-app/backend ./backend
+  - docker build -t registry.heroku.com/devradar-app/web ./web
   # Log in to the docker CLI
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - echo "$HEROKU_AUTH_TOKEN" | docker login -u "$HEROKU_DOCKER_USERNAME" --password-stdin registry.heroku.com
   # Take those images and push them to docker hub
-  - docker push paulomedeiros88/devradar-backend
-  - docker push paulomedeiros88/devradar-web
+  - docker push registry.heroku.com/devradar-app/backend
+  - docker push registry.heroku.com/devradar-app/web

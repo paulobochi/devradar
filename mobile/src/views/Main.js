@@ -5,6 +5,9 @@ import {
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { requestPermissionsAsync, getCurrentPositionAsync } from 'expo-location';
 import { MaterialIcons } from '@expo/vector-icons';
+import {
+  graphql, useLazyLoadQuery, useRelayEnvironment, fetchQuery,
+} from 'react-relay/hooks';
 
 const styles = StyleSheet.create({
   map: {
@@ -68,38 +71,81 @@ const styles = StyleSheet.create({
 
 function Main({ navigation }) {
   const [currentRegion, setCurrentRegion] = useState(null);
-
-  useEffect(() => {
-    async function loadInitialPosition() {
-      const { granted } = await requestPermissionsAsync();
-      if (granted) {
-        const { coords: { latitude, longitude } } = await getCurrentPositionAsync({
-          enableHighAccuracy: true,
-        });
-        setCurrentRegion({
-          latitude,
-          longitude,
-          latitudeDelta: 0.04,
-          longitudeDelta: 0.04,
-        });
+  const [technologiesFilter, setTechnologiesFilter] = useState('');
+  const [devs, setDevs] = useState([]);
+  const environment = useRelayEnvironment();
+  const mainQuery = graphql`
+    query MainQuery($technologies: [String]) {
+      devs(technologies: $technologies ) {
+        id
+        name
+        technologies
+        bio
+        githubUsername
+        avatarUrl
+        location {
+          coordinates
+        }
       }
     }
-    loadInitialPosition();
+  `;
+
+  const fetchDevs = () => {
+    fetchQuery(
+      environment,
+      mainQuery,
+      {
+        technologies: technologiesFilter ? technologiesFilter.split(', ') : [],
+      },
+    ).subscribe({
+      next: (data) => setDevs(data.devs),
+    });
+  };
+
+  const setInitialPosition = async () => {
+    const { granted } = await requestPermissionsAsync();
+    if (granted) {
+      const { coords: { latitude, longitude } } = await getCurrentPositionAsync({
+        enableHighAccuracy: true,
+      });
+      setCurrentRegion({
+        latitude,
+        longitude,
+        latitudeDelta: 0.04,
+        longitudeDelta: 0.04,
+      });
+    }
+  };
+
+  useEffect(() => {
+    setInitialPosition();
+    fetchDevs();
   }, []);
+
   return (
     <>
       <MapView style={styles.map} initialRegion={currentRegion}>
-        <Marker coordinate={{ latitude: -25.5328261, longitude: -54.5131051 }}>
-          <Image style={styles.avatar} source={{ uri: 'https://avatars0.githubusercontent.com/u/1917990?s=460&v=4' }}></Image>
+        {devs.map(({
+          id, name, bio, technologies, githubUsername, avatarUrl, location,
+        }) => (
+          <Marker
+            key={id}
+            coordinate={{
+              latitude: location.coordinates[1],
+              longitude: location.coordinates[0],
+            }}
+          >
+            <Image style={styles.avatar} source={{ uri: avatarUrl }}></Image>
 
-          <Callout style={styles.callout} onPress={() => {
-            navigation.navigate('Profile', { githubUsername: 'paulobochi' });
-          }}>
-            <Text style={styles.devName}>Paulo</Text>
-            <Text style={styles.devBio}>Adoro tecnologias</Text>
-            <Text style={styles.devTechs}>Ruby, Node, ReactJS, React Native, Docker</Text>
-          </Callout>
-        </Marker>
+            <Callout style={styles.callout} onPress={() => {
+              navigation.navigate('Profile', { githubUsername });
+            }}>
+              <Text style={styles.devName}>{name}</Text>
+              <Text style={styles.devBio}>{bio}</Text>
+              <Text style={styles.devTechs}>{(technologies || []).join(', ')}</Text>
+            </Callout>
+          </Marker>
+        ))}
       </MapView>
       <View style={styles.searchForm}>
         <TextInput
@@ -108,8 +154,10 @@ function Main({ navigation }) {
           placeholderTextColor="#999"
           autoCapitalize="words"
           autoCorrect={false}
+          value={technologiesFilter}
+          onChangeText={setTechnologiesFilter}
         />
-        <TouchableOpacity style={styles.submitButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.submitButton} onPress={() => fetchDevs()}>
           <MaterialIcons name="my-location" size={20} color="#FFF" />
         </TouchableOpacity>
       </View>

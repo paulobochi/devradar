@@ -9,7 +9,8 @@ function fetchQuery(
   operation,
   variables,
 ) {
-  return fetch('http://localhost:3333/graphql', {
+
+  return fetch(process.env.REACT_APP_GRAPHQL_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

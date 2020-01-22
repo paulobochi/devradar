@@ -2,7 +2,6 @@ const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLID,
-  GraphQLList,
   GraphQLFloat,
 } = require('graphql');
 const axios = require('axios');
@@ -11,6 +10,9 @@ const mongoose = require('mongoose');
 const Dev = mongoose.model('dev');
 const DevType = require('../types/dev');
 
+const { sendMessageToAll, sendNewDevMessage } = require('../../websocket');
+const parseStringAsArray = require('../../utils/parseStringAsArray');
+
 const mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
@@ -18,7 +20,7 @@ const mutation = new GraphQLObjectType({
       type: DevType,
       args: {
         githubUsername: { type: GraphQLString },
-        technologies: { type: new GraphQLList(GraphQLString) },
+        technologies: { type: GraphQLString },
         latitude: { type: GraphQLFloat },
         longitude: { type: GraphQLFloat },
       },
@@ -41,9 +43,11 @@ const mutation = new GraphQLObjectType({
             githubUsername,
             bio,
             avatarUrl: githubResponse.data.avatar_url,
-            technologies,
+            technologies: parseStringAsArray(technologies),
             location,
           });
+
+          sendNewDevMessage(dev);
         }
 
         return dev;

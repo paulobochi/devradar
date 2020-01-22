@@ -8,7 +8,7 @@ import './styles.css';
 const addDevMutation = graphql`
   mutation DevFormMutation (
     $githubUsername: String!
-    $technologies: [String]!
+    $technologies: String!
     $latitude: Float!
     $longitude: Float!
   ) {
@@ -57,7 +57,7 @@ function DevForm() {
       mutation: addDevMutation,
       variables: {
         githubUsername,
-        technologies: technologies.split(',').map((t) => t.trim()),
+        technologies,
         latitude,
         longitude,
       },
@@ -67,6 +67,7 @@ function DevForm() {
       },
       onError: (err) => console.error(err),
       updater: (store) => {
+        console.log(store.getRootField('addDev'));
         const newDev = store.getRootField('addDev');
         const currentDevs = store.getRoot().getLinkedRecords('devs');
         const exists = currentDevs.filter((dev) => dev.getValue('id') === newDev.getValue('id')).length > 0;

@@ -14,7 +14,7 @@ type DevType {
 }
 
 type Mutation {
-  addDev(name: String, githubUsername: String, technologies: [String], latitude: Float, longitude: Float): DevType
+  addDev(githubUsername: String, technologies: String, latitude: Float, longitude: Float): DevType
   deleteDev(id: ID): DevType
 }
 
@@ -25,6 +25,6 @@ type PointType {
 }
 
 type RootQueryType {
-  devs(latitude: Float, longitude: Float, technologies: [String]): [DevType]
+  devs(latitude: Float, longitude: Float, technologies: String): [DevType]
   dev(id: ID!): DevType
 }

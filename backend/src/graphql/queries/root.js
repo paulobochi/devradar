@@ -11,6 +11,8 @@ const {
 const Dev = mongoose.model('dev');
 const DevType = require('../types/dev');
 
+const parseStringAsArray = require('../../utils/parseStringAsArray');
+
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: () => ({
@@ -19,7 +21,7 @@ const RootQuery = new GraphQLObjectType({
       args: {
         latitude: { type: GraphQLFloat },
         longitude: { type: GraphQLFloat },
-        technologies: { type: new GraphQLList(GraphQLString) },
+        technologies: { type: GraphQLString },
       },
       resolve(parentValue, { latitude, longitude, technologies }) {
         const filters = {};
@@ -38,7 +40,7 @@ const RootQuery = new GraphQLObjectType({
 
         if (technologies && technologies.length > 0) {
           filters.technologies = {
-            $in: technologies,
+            $in: parseStringAsArray(technologies),
           };
         }
 

@@ -6,8 +6,9 @@ import MapView, { Marker, Callout } from 'react-native-maps';
 import { requestPermissionsAsync, getCurrentPositionAsync } from 'expo-location';
 import { MaterialIcons } from '@expo/vector-icons';
 import {
-  graphql, useLazyLoadQuery, useRelayEnvironment, fetchQuery,
+  graphql, useRelayEnvironment, fetchQuery,
 } from 'react-relay/hooks';
+import { connect, disconnect, subscribeToNewDevs } from '../services/socket';
 
 const styles = StyleSheet.create({
   map: {
@@ -71,11 +72,11 @@ const styles = StyleSheet.create({
 
 function Main({ navigation }) {
   const [currentRegion, setCurrentRegion] = useState(null);
-  const [technologiesFilter, setTechnologiesFilter] = useState('');
+  const [technologies, setTechnologies] = useState('');
   const [devs, setDevs] = useState([]);
   const environment = useRelayEnvironment();
   const mainQuery = graphql`
-    query MainQuery($technologies: [String]) {
+    query MainQuery($technologies: String) {
       devs(technologies: $technologies ) {
         id
         name
@@ -95,9 +96,14 @@ function Main({ navigation }) {
       environment,
       mainQuery,
       {
-        technologies: technologiesFilter ? technologiesFilter.split(', ') : [],
+        technologies,
       },
     ).subscribe({
+      complete: () => {
+        disconnect();
+        const { latitude, longitude } = currentRegion || {};
+        connect(latitude, longitude, technologies);
+      },
       next: (data) => setDevs(data.devs),
     });
   };
@@ -122,11 +128,15 @@ function Main({ navigation }) {
     fetchDevs();
   }, []);
 
+  useEffect(() => {
+    subscribeToNewDevs((dev) => { alert(dev); });
+  }, [devs]);
+
   return (
     <>
       <MapView style={styles.map} initialRegion={currentRegion}>
         {devs.map(({
-          id, name, bio, technologies, githubUsername, avatarUrl, location,
+          id, name, bio, technologies: techs, githubUsername, avatarUrl, location,
         }) => (
           <Marker
             key={id}
@@ -142,7 +152,7 @@ function Main({ navigation }) {
             }}>
               <Text style={styles.devName}>{name}</Text>
               <Text style={styles.devBio}>{bio}</Text>
-              <Text style={styles.devTechs}>{(technologies || []).join(', ')}</Text>
+              <Text style={styles.devTechs}>{(techs || []).join(', ')}</Text>
             </Callout>
           </Marker>
         ))}
@@ -154,8 +164,8 @@ function Main({ navigation }) {
           placeholderTextColor="#999"
           autoCapitalize="words"
           autoCorrect={false}
-          value={technologiesFilter}
-          onChangeText={setTechnologiesFilter}
+          value={technologies}
+          onChangeText={setTechnologies}
         />
         <TouchableOpacity style={styles.submitButton} onPress={() => fetchDevs()}>
           <MaterialIcons name="my-location" size={20} color="#FFF" />

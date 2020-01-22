@@ -4,6 +4,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const expressGraphQL = require('express-graphql');
 const cors = require('cors');
+const http = require('http');
+const { setupWebsocket } = require('./websocket');
 const schema = require('./graphql/schema');
 
 const MONGO_URI = 'mongodb://db:27017/devradar';
@@ -15,6 +17,9 @@ mongoose.connect(MONGO_URI, {
 });
 
 const app = express();
+const server = http.Server(app);
+
+setupWebsocket(server);
 
 app.use(express.json());
 app.use(cors());
@@ -26,4 +31,4 @@ app.use(
   }),
 );
 
-app.listen(3333);
+server.listen(3333);

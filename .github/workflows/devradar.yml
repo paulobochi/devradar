@@ -1,0 +1,17 @@
+name: Devradar
+
+on: [push]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build docker web for test
+      run: docker build -t paulomedeiros88/devradar-web:dev -f ./web/dev.Dockerfile ./web
+    
+    - name: Test web
+      run: docker run -e CI=true paulomedeiros88/devradar-web:dev npm test
